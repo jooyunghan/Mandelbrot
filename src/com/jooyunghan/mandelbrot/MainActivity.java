@@ -9,7 +9,7 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new MandelbrotView3(this));
+        setContentView(new MandelbrotView4(this));
     }
 
     @Override
