@@ -10,26 +10,37 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.util.AttributeSet;
 import android.view.View;
 
 public class MandelbrotView3 extends View {
+	private static final int COLOR_IN = 0xFFaa0033;
+	private static final int COLOR_OUT = 0xffffffff;
+	
 	private static final int PATCH_SIZE = 100;
 	private ArrayList<AsyncTask<Void, Void, Result>> tasks = new ArrayList<AsyncTask<Void, Void, Result>>();
 	public ArrayList<Result> queue = new ArrayList<Result>();
+	private Executor exec = Executors.newFixedThreadPool(4);
 
 	public MandelbrotView3(Context context) {
-		super(context);
+		this(context, null);
+	}
+	
+	public MandelbrotView3(Context context, AttributeSet attr) {
+		super(context, attr);
 	}
 
 	@SuppressLint("DrawAllocation")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-
-		for (Result r : queue) {
-			canvas.drawBitmap(r.bmp, r.clip.left, r.clip.top, null);
+		if (queue.isEmpty()) {
+			startTask(canvas.getWidth(), canvas.getHeight());
+		} else {
+			for (Result r : queue) {
+				canvas.drawBitmap(r.bmp, r.clip.left, r.clip.top, null);
+			}
 		}
-
 	}
 
 	@Override
@@ -49,7 +60,6 @@ public class MandelbrotView3 extends View {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		cancelTask();
-		startTask(w, h);
 	}
 
 	private void startTask(int w, int h) {
@@ -58,7 +68,8 @@ public class MandelbrotView3 extends View {
 			for (int y = 0; y < h; y += PATCH_SIZE) {
 				Rect clip = new Rect(x, y, x + PATCH_SIZE, y + PATCH_SIZE);
 				tasks.add(new MandelbrotTask(w, h, clip)
-						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR));
+						//.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR));
+						.executeOnExecutor(exec));
 			}
 		}
 	}
@@ -147,10 +158,9 @@ public class MandelbrotView3 extends View {
 						iter++;
 					}
 					if (iter == ITERATION) { // (dx, dy) is in mandelbrot set
-						bmp.setPixel(x, y, 0xFF000000);
+						bmp.setPixel(x, y, COLOR_IN);
 					} else { // out, then use iter for color
-						// int color = 0xFF000000 | iter;
-						bmp.setPixel(x, y, 0xFFFFFFFF);
+						bmp.setPixel(x, y, COLOR_OUT);
 					}
 				}
 			}

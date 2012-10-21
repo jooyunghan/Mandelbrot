@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RadioGroup
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <RadioButton 
+            android:id="@+id/button1"
+            android:text="Mandelbrot1"/>
+        <RadioButton 
+            android:id="@+id/button2"
+            android:text="Mandelbrot2"/>
+        <RadioButton 
+            android:id="@+id/button3"
+            android:text="Mandelbrot3"/>
+        <RadioButton 
+            android:id="@+id/button4"
+            android:text="Mandelbrot4"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/views"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <view class="com.jooyunghan.mandelbrot.MandelbrotView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/view1"
+            android:visibility="gone">
+        </view>
+        <view class="com.jooyunghan.mandelbrot.MandelbrotView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/view2"
+            android:visibility="gone">
+        </view>
+        <view class="com.jooyunghan.mandelbrot.MandelbrotView3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/view3"
+            android:visibility="gone">
+        </view>
+        <view class="com.jooyunghan.mandelbrot.MandelbrotView4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/view4"
+            android:visibility="gone">
+        </view>
+    </LinearLayout>
+
+</LinearLayout>

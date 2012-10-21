@@ -8,10 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 public class MandelbrotView2 extends View {
+	private static final int COLOR_IN = 0xFFaa3300;
+	private static final int COLOR_OUT = 0xffffffff;
+	
 	private static final String TAG = "MandelbrotView2";
 	private AsyncTask<Void, Result, Void> task;
 	public ArrayList<Result> queue = new ArrayList<Result>();
@@ -20,7 +24,11 @@ public class MandelbrotView2 extends View {
 	private int count;
 
 	public MandelbrotView2(Context context) {
-		super(context);
+		this(context, null);
+	}
+	
+	public MandelbrotView2(Context context, AttributeSet attr) {
+		super(context, attr);
 	}
 
 	@SuppressLint("DrawAllocation")
@@ -128,7 +136,7 @@ public class MandelbrotView2 extends View {
 					double dx = (x_begin + x) / scale + dx_begin;
 
 					if (dx < -2.0 || dx > 1.0 || dy < -1.0 || dy > 1.0) {
-						bmp.setPixel(x, y, 0xFF000000);
+						bmp.setPixel(x, y, COLOR_OUT);
 					}
 
 					if (isCancelled())
@@ -146,10 +154,9 @@ public class MandelbrotView2 extends View {
 						iter++;
 					}
 					if (iter == ITERATION) { // (dx, dy) is in mandelbrot set
-						bmp.setPixel(x, y, 0xFF000000);
-					} else { // out, then use iter for color
-						int color = 0xFF000000 | iter;
-						bmp.setPixel(x, y, color);
+						bmp.setPixel(x, y, COLOR_IN);
+					} else {
+						bmp.setPixel(x, y, COLOR_OUT);
 					}
 				}
 			}

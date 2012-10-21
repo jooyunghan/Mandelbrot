@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.renderscript.Allocation;
 import android.renderscript.Double2;
 import android.renderscript.RenderScript;
+import android.util.AttributeSet;
 import android.view.View;
 
 @SuppressLint("DrawAllocation")
@@ -21,7 +22,11 @@ public class MandelbrotView4 extends View {
 	private double dy_begin;
 
 	public MandelbrotView4(Context context) {
-		super(context);
+		this(context, null);
+	}
+	
+	public MandelbrotView4(Context context, AttributeSet attr) {
+		super(context, attr);
 		createScript();
 	}
 
