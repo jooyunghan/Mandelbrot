@@ -67,5 +67,11 @@ public class MandelbrotView4 extends View {
 		mRS = RenderScript.create(getContext());
 		mScript = new ScriptC_mandelbrot(mRS, getResources(), R.raw.mandelbrot);
 	}
+	
+	@Override
+	protected void onDetachedFromWindow() {
+		mRS.destroy();
+		super.onDetachedFromWindow();
+	}
 
 }
