@@ -9,67 +9,87 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-        <RadioButton 
+
+        <RadioButton
             android:id="@+id/button1"
-            android:text="Canvas"/>
-        <RadioButton 
+            android:text="Canvas" />
+
+        <RadioButton
             android:id="@+id/button2"
-            android:text="Bitmap"/>
-        <RadioButton 
+            android:text="Bitmap" />
+
+        <RadioButton
             android:id="@+id/button3"
-            android:text="RenderScript"/>
-        <RadioButton 
+            android:text="RenderScript" />
+
+        <RadioButton
             android:id="@+id/button4"
-            android:text="BitmapAsync"/>       
-        <RadioButton 
+            android:text="BitmapAsync" />
+
+        <RadioButton
             android:id="@+id/button5"
-            android:text="AsyncTileSerial"/>   
-   
-        <RadioButton 
+            android:text="AsyncTileSerial" />
+
+        <RadioButton
             android:id="@+id/button6"
-            android:text="AsyncTileConc4"/>           
-     </RadioGroup>
+            android:text="AsyncTileConc4" />
+
+    </RadioGroup>
+
     <LinearLayout
         android:id="@+id/views"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <view class="com.jooyunghan.mandelbrot.OnDrawCanvas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <view
             android:id="@+id/view0"
-            android:visibility="gone">
-        </view>        
-        <view class="com.jooyunghan.mandelbrot.OnDrawBitmap"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/view1"
-            android:visibility="gone">
+            class="com.jooyunghan.mandelbrot.OnDrawCanvas"
+            android:visibility="gone" >
         </view>
-        <view class="com.jooyunghan.mandelbrot.OnDrawRenderScript"
+
+        <view
+            android:id="@+id/view1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            class="com.jooyunghan.mandelbrot.OnDrawBitmap"
+            android:visibility="gone" >
+        </view>
+
+        <view
             android:id="@+id/view2"
-            android:visibility="gone">
-        </view>  
-        <view class="com.jooyunghan.mandelbrot.BitmapAsync"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            class="com.jooyunghan.mandelbrot.OnDrawRenderScript"
+            android:visibility="gone" >
+        </view>
+
+        <view
             android:id="@+id/view3"
-            android:visibility="gone">
-        </view>    
-        <view class="com.jooyunghan.mandelbrot.AsyncTileSerial"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            class="com.jooyunghan.mandelbrot.BitmapAsync"
+            android:visibility="gone" >
+        </view>
+
+        <view
             android:id="@+id/view4"
-            android:visibility="gone">
-        </view>   
-        <view class="com.jooyunghan.mandelbrot.AsyncTileConc4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            class="com.jooyunghan.mandelbrot.AsyncTileSerial"
+            android:visibility="gone" >
+        </view>
+
+        <view
             android:id="@+id/view5"
-            android:visibility="gone">
-        </view>         
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.jooyunghan.mandelbrot.AsyncTileConc4"
+            android:visibility="gone" >
+        </view>
+
     </LinearLayout>
 
 </LinearLayout>

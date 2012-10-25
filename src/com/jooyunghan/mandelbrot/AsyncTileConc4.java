@@ -25,11 +25,17 @@ public class AsyncTileConc4 extends View {
 	private static final int PATCH_SIZE = 100;
 	private ArrayList<AsyncTask<Void, Void, Result>> tasks = new ArrayList<AsyncTask<Void, Void, Result>>();
 	public ArrayList<Result> queue = new ArrayList<Result>();
-	private Executor exec = Executors.newFixedThreadPool(4);
+	private Executor exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private long start;
 	private long end1;
 	private long end2;
 
+	private int width;
+	private int height;
+	private double dx_begin;
+	private double dy_begin;
+	private double scale;
+	
 	public AsyncTileConc4(Context context) {
 		this(context, null);
 	}
@@ -50,7 +56,7 @@ public class AsyncTileConc4 extends View {
 			canvas.drawText(String.format("#1 onDraw(): %d ms", (end1-start)), TEXT_PADDING, TEXT_SIZE + TEXT_PADDING, paint_text);
 		} else {
 			for (Result r : queue) {
-				canvas.drawBitmap(r.bmp, r.clip.left, r.clip.top, null);
+				canvas.drawBitmap(r.bmp, r.x, r.y, null);
 			}
 			end2 = System.currentTimeMillis();
 			canvas.drawText(String.format("#1 onDraw(): %d ms", (end1-start)), TEXT_PADDING, TEXT_SIZE + TEXT_PADDING, paint_text);
@@ -60,6 +66,11 @@ public class AsyncTileConc4 extends View {
 
 	@Override
 	protected void onDetachedFromWindow() {
+		cancelTask();
+	}
+	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		cancelTask();
 	}
 
@@ -72,51 +83,57 @@ public class AsyncTileConc4 extends View {
 		queue.clear();
 	}
 
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		cancelTask();
-	}
-
 	private void startTask(int w, int h) {
-		
+		width = w;
+		height = h;
+		setScale();
 		for (int x = 0; x < w; x += PATCH_SIZE) {
 			for (int y = 0; y < h; y += PATCH_SIZE) {
-				Rect clip = new Rect(x, y, x + PATCH_SIZE, y + PATCH_SIZE);
-				tasks.add(new MandelbrotTask(w, h, clip)
-						.executeOnExecutor(exec));
+				tasks.add(new MandelbrotTask(x, y).executeOnExecutor(exec));
 			}
 		}
 	}
 
 	static class Result {
-		public Result(Rect clip2, Bitmap bmp2) {
-			this.clip = clip2;
+		public Result(int x, int y, Bitmap bmp2) {
+			this.x = x;
+			this.y = y;
 			this.bmp = bmp2;
 		}
 
-		Rect clip;
+		int x;
+		int y;
 		Bitmap bmp;
+	}
+	
+	private void setScale() {
+		double scaleX = (width - 1) / 3.0;
+		double scaleY = (height - 1) / 2.0;
+		if (scaleX < scaleY) {
+			scale = scaleX;
+			dx_begin = -2.0;
+			dy_begin = -(height / 2) / scale;
+		} else {
+			scale = scaleY;
+			dx_begin = -2 - ((width - (int) (3 * scale)) / 2) / scale;
+			dy_begin = -1;
+		}
 	}
 
 	class MandelbrotTask extends AsyncTask<Void, Void, Result> {
 		private static final int ITERATION = 1000;
-		private int width;
-		private int height;
-		private double dx_begin;
-		private double dy_begin;
-		private double scale;
-		private Rect clip;
 
-		public MandelbrotTask(int width, int height, Rect clip) {
-			this.width = width;
-			this.height = height;
-			this.clip = clip;
-			setScale();
+		private int x_begin;
+		private int y_begin;
+
+		public MandelbrotTask(int x, int y) {
+			this.x_begin = x;
+			this.y_begin = y;
 		}
 
 		@Override
 		protected Result doInBackground(Void... params) {
-			return mandelbrot(clip);
+			return mandelbrot();
 		}
 
 		@Override
@@ -125,25 +142,8 @@ public class AsyncTileConc4 extends View {
 			postInvalidate();
 		}
 
-		private void setScale() {
-			double scaleX = (width - 1) / 3.0;
-			double scaleY = (height - 1) / 2.0;
-			if (scaleX < scaleY) {
-				scale = scaleX;
-				dx_begin = -2.0;
-				dy_begin = -(height / 2) / scale;
-			} else {
-				scale = scaleY;
-				dx_begin = -2 - ((width - (int) (3 * scale)) / 2) / scale;
-				dy_begin = -1;
-			}
-		}
-
-		private Result mandelbrot(Rect clip) {
-			int x_begin = clip.left;
-			int y_begin = clip.top;
-
-			Bitmap bmp = Bitmap.createBitmap(clip.width(), clip.height(),
+		private Result mandelbrot() {
+			Bitmap bmp = Bitmap.createBitmap(PATCH_SIZE, PATCH_SIZE,
 					Bitmap.Config.ARGB_8888);
 
 			int w = bmp.getWidth();
@@ -174,7 +174,7 @@ public class AsyncTileConc4 extends View {
 					}
 				}
 			}
-			return new Result(clip, bmp);
+			return new Result(x_begin, y_begin, bmp);
 		}
 
 	}
