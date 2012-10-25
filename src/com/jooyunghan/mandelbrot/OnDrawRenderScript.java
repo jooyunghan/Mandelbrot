@@ -1,52 +1,60 @@
 package com.jooyunghan.mandelbrot;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.renderscript.Allocation;
 import android.renderscript.Double2;
 import android.renderscript.RenderScript;
 import android.util.AttributeSet;
 import android.view.View;
 
-@SuppressLint("DrawAllocation")
-public class MandelbrotView4 extends View {
+public class OnDrawRenderScript extends View {
 	private RenderScript mRS;
 	private ScriptC_mandelbrot mScript;
+
+	private static final int TEXT_PADDING = 10;
+	private static final float TEXT_SIZE = 40.0f;
+	private Paint paint_text = new Paint();
+
 	private int width;
 	private int height;
 	private double scale;
 	private double dx_begin;
 	private double dy_begin;
 
-	public MandelbrotView4(Context context) {
+	public OnDrawRenderScript(Context context) {
 		this(context, null);
 	}
-	
-	public MandelbrotView4(Context context, AttributeSet attr) {
+
+	public OnDrawRenderScript(Context context, AttributeSet attr) {
 		super(context, attr);
 		createScript();
+		paint_text.setTextSize(TEXT_SIZE);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
+		long start = System.currentTimeMillis();
 		width = canvas.getWidth();
 		height = canvas.getHeight();
 		setScale();
-		
-		Bitmap b = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(),
-				Config.ARGB_8888);
+
+		Bitmap b = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		Allocation out = Allocation.createFromBitmap(mRS, b);
 		mScript.set_d_begin(new Double2(dx_begin, dy_begin));
-		mScript.set_i_begin(new Double2(0, 0));
 		mScript.set_scale(scale);
 		mScript.forEach_root(out);
 		out.copyTo(b);
 		canvas.drawBitmap(b, 0, 0, null);
+		b.recycle();
+		
+		long end = System.currentTimeMillis();
+		canvas.drawText(String.format("%d ms", (end - start)), TEXT_PADDING,
+				TEXT_SIZE + TEXT_PADDING, paint_text);
 	}
 
 	private void setScale() {
@@ -62,12 +70,12 @@ public class MandelbrotView4 extends View {
 			dy_begin = -1;
 		}
 	}
-	
+
 	private void createScript() {
 		mRS = RenderScript.create(getContext());
 		mScript = new ScriptC_mandelbrot(mRS, getResources(), R.raw.mandelbrot);
 	}
-	
+
 	@Override
 	protected void onDetachedFromWindow() {
 		mRS.destroy();

@@ -8,26 +8,34 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class MandelbrotView3 extends View {
+public class AsyncTileSerial extends View {
+	private static final int TEXT_PADDING = 10;
+	private static final float TEXT_SIZE = 40.0f;
+	private Paint paint_text = new Paint();
+	
 	private static final int COLOR_IN = 0xFFaa0033;
 	private static final int COLOR_OUT = 0xffffffff;
 	
 	private static final int PATCH_SIZE = 100;
 	private ArrayList<AsyncTask<Void, Void, Result>> tasks = new ArrayList<AsyncTask<Void, Void, Result>>();
 	public ArrayList<Result> queue = new ArrayList<Result>();
-	private Executor exec = Executors.newFixedThreadPool(4);
+	private long start;
+	private long end1;
+	private long end2;
 
-	public MandelbrotView3(Context context) {
+	public AsyncTileSerial(Context context) {
 		this(context, null);
 	}
 	
-	public MandelbrotView3(Context context, AttributeSet attr) {
+	public AsyncTileSerial(Context context, AttributeSet attr) {
 		super(context, attr);
+		paint_text.setTextSize(TEXT_SIZE);
 	}
 
 	@SuppressLint("DrawAllocation")
@@ -35,11 +43,17 @@ public class MandelbrotView3 extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		if (queue.isEmpty()) {
+			start = System.currentTimeMillis();
 			startTask(canvas.getWidth(), canvas.getHeight());
+			end1 = System.currentTimeMillis();
+			canvas.drawText(String.format("#1 onDraw(): %d ms", (end1-start)), TEXT_PADDING, TEXT_SIZE + TEXT_PADDING, paint_text);
 		} else {
 			for (Result r : queue) {
 				canvas.drawBitmap(r.bmp, r.clip.left, r.clip.top, null);
 			}
+			end2 = System.currentTimeMillis();
+			canvas.drawText(String.format("#1 onDraw(): %d ms", (end1-start)), TEXT_PADDING, TEXT_SIZE + TEXT_PADDING, paint_text);
+			canvas.drawText(String.format("#2 onDraw(): %d ms", (end2-start)), TEXT_PADDING, (TEXT_SIZE + TEXT_PADDING)*2, paint_text);
 		}
 	}
 
@@ -67,9 +81,7 @@ public class MandelbrotView3 extends View {
 		for (int x = 0; x < w; x += PATCH_SIZE) {
 			for (int y = 0; y < h; y += PATCH_SIZE) {
 				Rect clip = new Rect(x, y, x + PATCH_SIZE, y + PATCH_SIZE);
-				tasks.add(new MandelbrotTask(w, h, clip)
-						//.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR));
-						.executeOnExecutor(exec));
+				tasks.add(new MandelbrotTask(w, h, clip).execute());
 			}
 		}
 	}
@@ -138,10 +150,6 @@ public class MandelbrotView3 extends View {
 				double dy = (y_begin + y) / scale + dy_begin;
 				for (int x = 0; x < w; x++) {
 					double dx = (x_begin + x) / scale + dx_begin;
-
-					if (dx < -2.0 || dx > 1.0 || dy < -1.0 || dy > 1.0) {
-						bmp.setPixel(x, y, 0xFF000000);
-					}
 
 					if (isCancelled())
 						return null;

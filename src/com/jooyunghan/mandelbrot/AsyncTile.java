@@ -9,10 +9,9 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
-public class MandelbrotView2 extends View {
+public class AsyncTile extends View {
 	private static final int COLOR_IN = 0xFFaa3300;
 	private static final int COLOR_OUT = 0xffffffff;
 	
@@ -23,11 +22,11 @@ public class MandelbrotView2 extends View {
 	private int height;
 	private int count;
 
-	public MandelbrotView2(Context context) {
+	public AsyncTile(Context context) {
 		this(context, null);
 	}
 	
-	public MandelbrotView2(Context context, AttributeSet attr) {
+	public AsyncTile(Context context, AttributeSet attr) {
 		super(context, attr);
 	}
 

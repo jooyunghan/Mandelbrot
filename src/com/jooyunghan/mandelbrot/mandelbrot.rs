@@ -4,28 +4,26 @@
 #include "rs_graphics.rsh"
 
 #define ITERATION 1000
-
+#define COLORS    10
 
 double2 d_begin;
-double2 i_begin;
 double  scale;
 
-uchar4 black;
-uchar4 white;
+uchar4 color_in;
+uchar4 color_out;
+//uchar4 white[COLORS];
 
 void init() {
- black = rsPackColorTo8888(0, 0, 0);
- white = rsPackColorTo8888(1, 1, 1);
+ color_in = rsPackColorTo8888(0, 0, 0);
+ color_out = rsPackColorTo8888(1, 1, 1);
+// for (int i=0; i<COLORS; i++) {
+// 	white[i] = rsPackColorTo8888(i/(double)(COLORS-1), i/(double)(COLORS-1), 1);
+// }
 }
 
 void root(uchar4 *v_out,  uint32_t x, uint32_t y) {
     double2 i = { x, y };
-    double2 d = (i_begin + i) / scale + d_begin;
-    
-    if (d.x < -2.0 || d.x > 1.0 || d.y < -1.0 || d.y > 1.0) {
-        *v_out = white;
-        return;
-    }
+    double2 d = i / scale + d_begin;
 
    // iterate
     double2 z = { 0, 0 };
@@ -37,8 +35,8 @@ void root(uchar4 *v_out,  uint32_t x, uint32_t y) {
     }
 
     if (iter == ITERATION) { // (dx, dy) is in mandelbrot set
-        *v_out = black;
+        *v_out = color_in;
     } else { // out, then use iter for color
-        *v_out = white;
+        *v_out = color_out;
     }
 }
